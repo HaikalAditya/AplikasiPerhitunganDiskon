@@ -1,3 +1,7 @@
+
+import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -9,14 +13,31 @@
  * @author User
  */
 public class DiskonFrame extends javax.swing.JFrame {
-
     /**
      * Creates new form DiskonFrame
      */
+    // Deklarasi DefaultListModel sebagai variabel kelas
+DefaultListModel<String> historyModel;
+    
     public DiskonFrame() {
         initComponents();
-    }
+        
+        // Inisialisasi model untuk JList riwayat perhitungan
+    historyModel = new DefaultListModel<>();
+    jList1.setModel(historyModel); // Set model ke JList
 
+    // Hubungkan ComboBox dengan Slider
+    jComboBox1.addActionListener(e -> {
+        int discount = getDiscountFromComboBox();
+        jSlider1.setValue(discount); // Sinkronkan nilai slider dengan pilihan ComboBox
+    });
+
+    // Hubungkan Slider dengan ComboBox
+    jSlider1.addChangeListener(e -> {
+        int discount = jSlider1.getValue();
+        updateComboBoxBasedOnSlider(discount);
+    });
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -38,16 +59,16 @@ public class DiskonFrame extends javax.swing.JFrame {
         fieldKupon = new javax.swing.JTextField();
         jComboBox1 = new javax.swing.JComboBox<>();
         jButton1 = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
         jSlider1 = new javax.swing.JSlider();
         jLabel6 = new javax.swing.JLabel();
-        lblJumlahP = new javax.swing.JLabel();
-        lblHargaAkhir = new javax.swing.JLabel();
+        fieldHasil = new javax.swing.JTextField();
+        fieldPenghematan = new javax.swing.JTextField();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jList1 = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Aplikasi Perhitungan Diskon");
-        setPreferredSize(new java.awt.Dimension(600, 600));
+        setPreferredSize(new java.awt.Dimension(800, 800));
 
         jPanel1.setLayout(new java.awt.CardLayout());
 
@@ -93,26 +114,46 @@ public class DiskonFrame extends javax.swing.JFrame {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         jPanel2.add(jLabel5, gridBagConstraints);
+
+        fieldInput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                fieldInputKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                fieldInputKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                fieldInputKeyTyped(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         jPanel2.add(fieldInput, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         jPanel2.add(fieldKupon, gridBagConstraints);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "20%", "40%", "60%", "80%" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "- Pilih -", "5%", "10%", "15%", "20%" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         jPanel2.add(jComboBox1, gridBagConstraints);
 
         jButton1.setText("Hitung");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -120,19 +161,15 @@ public class DiskonFrame extends javax.swing.JFrame {
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         jPanel2.add(jButton1, gridBagConstraints);
 
-        jScrollPane1.setViewportView(jList1);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 7;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        jPanel2.add(jScrollPane1, gridBagConstraints);
+        jSlider1.setMajorTickSpacing(5);
+        jSlider1.setMaximum(20);
+        jSlider1.setMinimum(5);
+        jSlider1.setPaintLabels(true);
+        jSlider1.setPaintTicks(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         jPanel2.add(jSlider1, gridBagConstraints);
@@ -144,20 +181,119 @@ public class DiskonFrame extends javax.swing.JFrame {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         jPanel2.add(jLabel6, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
-        jPanel2.add(lblJumlahP, gridBagConstraints);
+
+        fieldHasil.setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
-        jPanel2.add(lblHargaAkhir, gridBagConstraints);
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        jPanel2.add(fieldHasil, gridBagConstraints);
+
+        fieldPenghematan.setEditable(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        jPanel2.add(fieldPenghematan, gridBagConstraints);
+
+        jScrollPane1.setToolTipText("");
+        jScrollPane1.setViewportView(jList1);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        jPanel2.add(jScrollPane1, gridBagConstraints);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+          try {
+        double originalPrice = Double.parseDouble(fieldInput.getText()); // Ambil harga asli dari input
+        int discountPercent = jSlider1.getValue(); // Ambil diskon dari Slider
+
+        // Periksa apakah kode kupon memberikan diskon tambahan
+        String couponCode = fieldKupon.getText();
+        double additionalDiscount = 0.0;
+        if ("DISKON5".equalsIgnoreCase(couponCode)) {
+            additionalDiscount = 5; // Diskon tambahan 5%
+        } else if ("DISKON10".equalsIgnoreCase(couponCode)) {
+            additionalDiscount = 10; // Diskon tambahan 10%
+        }
+
+        // Hitung total diskon
+        double totalDiscount = discountPercent + additionalDiscount;
+        double savings = originalPrice * totalDiscount / 100;
+        double finalPrice = originalPrice - savings;
+
+        // Tampilkan hasil
+        fieldPenghematan.setText(String.format("Rp %.2f", savings));
+        fieldHasil.setText(String.format("Rp %.2f", finalPrice));
+        
+         // Tambahkan ke riwayat perhitungan
+        String historyEntry = String.format("Harga Asli: Rp %.2f, Diskon: %d%%, Kupon: %s, Harga Akhir: Rp %.2f", originalPrice, discountPercent, couponCode, finalPrice);
+        historyModel.addElement(historyEntry); // Menambahkan entri ke model JList
+        
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(this, "Masukkan harga yang valid!", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void fieldInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_fieldInputKeyReleased
+        // Cek apakah priceField kosong
+    if (fieldInput.getText().isEmpty()) {
+        fieldKupon.setText(""); // Kosongkan couponField jika priceField kosong
+    }
+    }//GEN-LAST:event_fieldInputKeyReleased
+
+    private void fieldInputKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_fieldInputKeyPressed
+
+    }//GEN-LAST:event_fieldInputKeyPressed
+
+    private void fieldInputKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_fieldInputKeyTyped
+                 char c = evt.getKeyChar();
+    if (!Character.isDigit(c) && c != '.') {
+        evt.consume();  // Hanya menerima angka dan titik desimal
+    }
+    }//GEN-LAST:event_fieldInputKeyTyped
+
+    // Metode untuk mendapatkan nilai diskon dari ComboBox
+    private int getDiscountFromComboBox() {
+        String selectedDiscount = (String) jComboBox1.getSelectedItem();
+        return Integer.parseInt(selectedDiscount.replace("%", ""));
+}
+    
+    
+// Metode untuk memperbarui ComboBox sesuai dengan nilai Slider
+private void updateComboBoxBasedOnSlider(int sliderValue) {
+    switch (sliderValue) {
+        case 5:
+            jComboBox1.setSelectedItem("5%");
+            break;
+        case 10:
+            jComboBox1.setSelectedItem("10%");
+            break;
+        case 15:
+            jComboBox1.setSelectedItem("15%");
+            break;
+        case 20:
+            jComboBox1.setSelectedItem("20%");
+            break;
+        default:
+            // Nilai lain tidak mengubah ComboBox
+            break;
+    }
+}
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -194,8 +330,10 @@ public class DiskonFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField fieldHasil;
     private javax.swing.JTextField fieldInput;
     private javax.swing.JTextField fieldKupon;
+    private javax.swing.JTextField fieldPenghematan;
     private javax.swing.JButton jButton1;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
@@ -209,7 +347,5 @@ public class DiskonFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSlider jSlider1;
-    private javax.swing.JLabel lblHargaAkhir;
-    private javax.swing.JLabel lblJumlahP;
     // End of variables declaration//GEN-END:variables
 }
